@@ -47,6 +47,12 @@ def spline_gen(points_femur, points_tibia, period, cycles):
 	print(f_femur_sample)
 	print(f_tibia_sample)
 
+def standingGait():
+	standing_femur = [0.30, 0.50, 0.30, 0.10]
+	standing_tibia = [0.20, 0.40, 0.20, 0.00]
+	spline_gen(standing_femur, standing_tibia, 5, 2)
+
+
 
 def manualGait(manualGaitFilePath):
 	manual_femur = list()
