@@ -3,6 +3,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+import json
 
 # prints (returns) the femur and tibia value in lists
 def spline_gen(points_femur, points_tibia, period, cycles):
