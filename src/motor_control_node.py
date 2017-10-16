@@ -36,6 +36,7 @@
 
 import rospy
 from std_msgs.msg import String
+from sensor_msgs.msg import Imu
 from spyndra import gaitModule
 
 # from BNO055 import *
@@ -130,10 +131,10 @@ def set_leg_counter(phase, chassis):
 
 def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
     # publisher init
-    motor_pub = rospy.Publisher('motor/signal', String, queue_size=10)
+    #motor_pub = rospy.Publisher('motor/signal', String, queue_size=10)
     # imu_pub = rospy.Publisher('imu/data', String, queue_size=10)
-    rospy.init_node('spline_runner', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
+    #rospy.init_node('spline_runner', anonymous=True)
+    #rate = rospy.Rate(10) # 10hz
 
     # comment out imu stuff for now
     # IMU_cycleThreshold, IMU_cycleCounter = imu_init()
@@ -195,9 +196,9 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
 
             singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
                 tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-            rospy.loginfo(str(singal1))
-            motor_pub.publish(str(singal1))
-            rate.sleep()
+            #rospy.loginfo(str(singal1))
+            #motor_pub.publish(str(singal1))
+            #rate.sleep()
 
             # singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
             #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
@@ -233,16 +234,31 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
         leg2_counter+=1
         leg3_counter+=1
         leg4_counter+=1
+    
+    return chassisOutput1, chassisOutput2, chassisOutput3, chassisOutput4, tibiaOutput1, tibiaOutput2, tibiaOutput3, tibiaOutput4    
 
-def main():
-    # chassis, tibia = gaitModule.randomGait()
+def callback(msg):
+    gravity = msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z 
+    euler   = msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z
+    #rospy.loginfo(gravity)
     chassis, tibia = gaitModule.standingGait()
     phase = 0
     motor_minmax_values = 250, 300
     motor_type = 1
+    # msg type needs to be customized!!!
+    pub = rospy.Publisher("motor_signal", String, queue_size=10)
     while not rospy.is_shutdown():
-        spline_run(chassis, tibia, phase, motor_type, motor_minmax_values)
+        motor_signal = spline_run(chassis, tibia, phase, motor_type, motor_minmax_values)
+        pub.publish(motor_signal)
 
+def main():
+    # chassis, tibia = gaitModule.randomGait()
+    # IMU
+    rospy.init_node("motor_control_node")
+    rospy.Subscriber("/imu/data", Imu, callback)
+    
+    rospy.spin()
+    
 
 if __name__ == '__main__':
     try:
