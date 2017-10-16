@@ -37,7 +37,7 @@
 import rospy
 from std_msgs.msg import String
 
-from BNO055 import *
+# from BNO055 import *
 from datetime import datetime
 import json 
 import numpy as np
@@ -190,7 +190,7 @@ def spline_run(chassis, tibia, phase, bno, flatMatrix):
 
             # get motor signal data in dictionary in the format:
 
-'''            motor_signal_data = {
+            '''motor_signal_data = {
             'motor_type': 1 or 2
             'motor_output_1': {
                 chassisOutput, 
@@ -219,14 +219,14 @@ def spline_run(chassis, tibia, phase, bno, flatMatrix):
             }'''
 
 
-            singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, tibiaOutput2,
-                chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
+                tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
             rospy.loginfo(str(singal1))
             motor_pub.publish(str(singal1))
             rate.sleep()
 
-            singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, tibiaOutput2,
-                chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
+                tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
             rospy.loginfo(str(singal2))
             motor_pub.publish(str(singal2))
             rate.sleep()
@@ -254,8 +254,8 @@ def spline_run(chassis, tibia, phase, bno, flatMatrix):
             # self.motor.output_motor(chassisOutput3, tibiaOutput3, 4, 5)
             # self.motor.output_motor(chassisOutput4, tibiaOutput4, 6, 7)
 
-            singal3 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, tibiaOutput2,
-                chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            singal3 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
+                tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
             rospy.loginfo(str(singal3))
             motor_pub.publish(str(singal3))
             rate.sleep()
