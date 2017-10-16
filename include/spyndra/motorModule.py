@@ -21,6 +21,10 @@ class SpyndraMotor:
 		self.motor6_max = 300
 		self.motor7_min = 250
 		self.motor7_max = 300
+		self.tibia_min = 250
+		self.tibia_max = 300
+		self.chassis_min = 250
+		self.chassis_max = 300
 
 		# internal objects
 		self.pwm = Adafruit_PCA9685.PCA9685()

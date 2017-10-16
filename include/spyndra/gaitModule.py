@@ -7,46 +7,41 @@ import json
 
 # prints (returns) the femur and tibia value in lists
 def spline_gen(points_femur, points_tibia, period, cycles):
+    freq=60
 
-        freq=60
+    y_femur=np.array(points_femur)
+    y_tibia=np.array(points_tibia)
+    x_femur=np.linspace(0, period, num=len(y_femur))
+    x_tibia=np.linspace(0, period, num=len(y_tibia))
 
-        y_femur=np.array(points_femur)
-        y_tibia=np.array(points_tibia)
-        x_femur=np.linspace(0, period, num=len(y_femur))
-        x_tibia=np.linspace(0, period, num=len(y_tibia))
+    y_femur_iter=y_femur
+    for i in range(cycles+2):
+            y_femur=np.append(y_femur,y_femur_iter)
+    y_tibia_iter=y_tibia
+    for i in range(cycles+2):
+            y_tibia=np.append(y_tibia,y_tibia_iter)
 
-        y_femur_iter=y_femur
-        for i in range(cycles+2):
-                y_femur=np.append(y_femur,y_femur_iter)
-        y_tibia_iter=y_tibia
-        for i in range(cycles+2):
-                y_tibia=np.append(y_tibia,y_tibia_iter)
+    #time array 1-1 correspondence to joint angles with period*(cycles+2) points
+    x_femur=np.linspace(0, period*(cycles+2), num=len(y_femur))
+    x_tibia=np.linspace(0, period*(cycles+2), num=len(y_tibia))
 
-        #time array 1-1 correspondence to joint angles with period*(cycles+2) points
-        x_femur=np.linspace(0, period*(cycles+2), num=len(y_femur))
-        x_tibia=np.linspace(0, period*(cycles+2), num=len(y_tibia))
+    #interpolate
+    f_femur = interp1d(x_femur, y_femur, kind='cubic')
+    f_tibia = interp1d(x_tibia, y_tibia, kind='cubic')
 
-        #interpolate
-        f_femur = interp1d(x_femur, y_femur, kind='cubic')
-        f_tibia = interp1d(x_tibia, y_tibia, kind='cubic')
+    #create high res time array without first and last cycle
+    #something wrong, doesnt start at start point
+    x_femur_cut=np.linspace(period, period*(cycles+2)-2.5, period*freq*cycles)
+    x_tibia_cut=np.linspace(period, period*(cycles+2)-2.5, period*freq*cycles)
+    #returns array of sampled function
+    f_femur_sample=f_femur(x_femur_cut)
+    f_tibia_sample=f_tibia(x_tibia_cut)
 
-        #create high res time array without first and last cycle
-        #something wrong, doesnt start at start point
-        x_femur_cut=np.linspace(period, period*(cycles+2)-2.5, period*freq*cycles)
-        x_tibia_cut=np.linspace(period, period*(cycles+2)-2.5, period*freq*cycles)
-        #returns array of sampled function
-        f_femur_sample=f_femur(x_femur_cut)
-        f_tibia_sample=f_tibia(x_tibia_cut)
-
-        #Graphical output for this. Comment out for outputting to Spyndra
-        #print(f_femur_sample)
-        #plt.plot(x_femur, y_femur, 'o', x_femur_cut, f_femur(x_femur_cut), '--')
-        #plt.show()
-
-	#Pipe
-	#Pipe f_femur_sample, f_tibia_sample
-	print(f_femur_sample)
-	print(f_tibia_sample)
+    #Graphical output for this. Comment out for outputting to Spyndra
+    #print(f_femur_sample)
+    #plt.plot(x_femur, y_femur, 'o', x_femur_cut, f_femur(x_femur_cut), '--')
+    #plt.show()
+    return f_femur_sample, f_tibia_sample
 
 
 
@@ -65,7 +60,7 @@ def manualGait(manualGaitFilePath):
 	manual_tibia.remove("")
 	manual_femur = map(int, manual_femur)
 	manual_tibia = map(int, manual_tibia) 
-	spline_gen(manual_femur, manual_tibia, 5, 2)
+	return spline_gen(manual_femur, manual_tibia, 5, 2)
 
 def randomGait():
 	def checkVelocityArr(arr):
@@ -98,9 +93,42 @@ def randomGait():
 	       "Tibia Sequence": b}
 	json.dump(key, file, sort_keys = True, indent = 4)
 	file.close()
-	spline_gen(random_femur, random_tibia, 5, 2) #changed 2 to 10 cycles
+	return spline_gen(random_femur, random_tibia, 5, 2) #changed 2 to 10 cycles
 
 def standingGait():
 	standing_femur = [0.30, 0.50, 0.30, 0.10]
 	standing_tibia = [0.20, 0.40, 0.20, 0.00]
-	spline_gen(standing_femur, standing_tibia, 5, 2)
+	return spline_gen(standing_femur, standing_tibia, 5, 2)
+
+
+# #Stands Spyndra up before spline execution
+# def spyndraStand():
+# 	startFemur = 255
+# 	startTibia = 570
+# 	outputMotor(startFemur, startTibia, 0, 1)
+# 	outputMotor(startFemur, startTibia, 2, 3)	
+# 	outputMotor(startFemur, startTibia, 4, 5)
+# 	outputMotor(startFemur, startTibia, 6, 7)
+# 	while startTibia > 275:
+# 		startTibia += -1
+# 		outputMotor(startFemur, startTibia, 0, 1)
+# 		outputMotor(startFemur, startTibia, 2, 3)
+# 		outputMotor(startFemur, startTibia, 4, 5)
+# 		outputMotor(startFemur, startTibia, 6, 7)
+# 		time.sleep(0.001) 
+		
+# #Sits Spyndra back down after spline execution
+# def spyndraSit():	
+# 	endFemur = 255
+# 	endTibia = 275
+# 	outputMotor(endFemur, endTibia, 0, 1)
+# 	outputMotor(endFemur, endTibia, 2, 3)
+# 	outputMotor(endFemur, endTibia, 4, 5)
+# 	outputMotor(endFemur, endTibia, 6, 7)
+# 	while endTibia < 550:
+# 		endTibia += 1
+# 		outputMotor(endFemur, endTibia, 0, 1)
+# 		outputMotor(endFemur, endTibia, 2, 3)
+# 		outputMotor(endFemur, endTibia, 4, 5)
+# 		outputMotor(endFemur, endTibia, 6, 7)
+# 		time.sleep(0.01)
