@@ -243,11 +243,11 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
                 motor_pub.publish(str(singal1))
                 rate.sleep()
 
-                singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
-                    tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-                rospy.loginfo(str(singal2))
-                motor_pub.publish(str(singal2))
-                rate.sleep()
+                # singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
+                #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+                # rospy.loginfo(str(singal2))
+                # motor_pub.publish(str(singal2))
+                # rate.sleep()
 
             #run for motor angles
             elif self.motor.motor_type == 3:
@@ -264,11 +264,11 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
                 tibiaOutput4 = tibia[leg4_counter]  
                 
                 
-                singal3 = motor_getsignal(3, chassisOutput1, tibiaOutput1, chassisOutput2, \
-                    tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-                rospy.loginfo(str(singal3))
-                motor_pub.publish(str(singal3))
-                rate.sleep()
+                # singal3 = motor_getsignal(3, chassisOutput1, tibiaOutput1, chassisOutput2, \
+                #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+                # rospy.loginfo(str(singal3))
+                # motor_pub.publish(str(singal3))
+                # rate.sleep()
 
             # #read data from IMU
             # imu_getdata(IMU_cycleCounter, IMU_cycleThreshold)
