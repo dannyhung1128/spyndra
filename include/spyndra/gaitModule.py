@@ -101,34 +101,55 @@ def standingGait():
 	return spline_gen(standing_femur, standing_tibia, 5, 2)
 
 
-# #Stands Spyndra up before spline execution
-# def spyndraStand():
-# 	startFemur = 255
-# 	startTibia = 570
-# 	outputMotor(startFemur, startTibia, 0, 1)
-# 	outputMotor(startFemur, startTibia, 2, 3)	
-# 	outputMotor(startFemur, startTibia, 4, 5)
-# 	outputMotor(startFemur, startTibia, 6, 7)
-# 	while startTibia > 275:
-# 		startTibia += -1
-# 		outputMotor(startFemur, startTibia, 0, 1)
-# 		outputMotor(startFemur, startTibia, 2, 3)
-# 		outputMotor(startFemur, startTibia, 4, 5)
-# 		outputMotor(startFemur, startTibia, 6, 7)
-# 		time.sleep(0.001) 
+#Stands Spyndra up before spline execution
+def spyndraStand():
+	startFemur = 255
+	startTibia = 570
+	femur = []
+	tibia = []
+	femur.append(startFemur)
+	femur.append(startFemur)
+	femur.append(startFemur)
+	femur.append(startFemur)
+	tibia.append(startTibia)
+	tibia.append(startTibia)
+	tibia.append(startTibia)
+	tibia.append(startTibia)
+	while startTibia > 275:
+		startTibia += -1
+		femur.append(startFemur)
+		femur.append(startFemur)
+		femur.append(startFemur)
+		femur.append(startFemur)
+		tibia.append(startTibia)
+		tibia.append(startTibia)
+		tibia.append(startTibia)
+		tibia.append(startTibia)
+	return femur, tibia
 		
-# #Sits Spyndra back down after spline execution
-# def spyndraSit():	
-# 	endFemur = 255
-# 	endTibia = 275
-# 	outputMotor(endFemur, endTibia, 0, 1)
-# 	outputMotor(endFemur, endTibia, 2, 3)
-# 	outputMotor(endFemur, endTibia, 4, 5)
-# 	outputMotor(endFemur, endTibia, 6, 7)
-# 	while endTibia < 550:
-# 		endTibia += 1
-# 		outputMotor(endFemur, endTibia, 0, 1)
-# 		outputMotor(endFemur, endTibia, 2, 3)
-# 		outputMotor(endFemur, endTibia, 4, 5)
-# 		outputMotor(endFemur, endTibia, 6, 7)
-# 		time.sleep(0.01)
+#Sits Spyndra back down after spline execution
+def spyndraSit():	
+	endFemur = 255
+	endTibia = 275
+	femur = []
+	tibia = []
+	femur.append(startFemur)
+	femur.append(startFemur)
+	femur.append(startFemur)
+	femur.append(startFemur)
+	tibia.append(startTibia)
+	tibia.append(startTibia)
+	tibia.append(startTibia)
+	tibia.append(startTibia)
+	while endTibia < 550:
+		endTibia += 1
+		femur.append(startFemur)
+		femur.append(startFemur)
+		femur.append(startFemur)
+		femur.append(startFemur)
+		tibia.append(startTibia)
+		tibia.append(startTibia)
+		tibia.append(startTibia)
+		tibia.append(startTibia)
+	return femur, tibia
+

@@ -47,50 +47,6 @@ import time
 import csv
 from subprocess import Popen, PIPE
 
-# return the init content of imu data
-def imu_init():
-    IMU_file = './IMU_data/' + fileName + '.csv'
-    tick = datetime.now()
-
-    #with open(IMU_file, 'a') as csvfile:
-    #        IMU_writer = csv.writer(csvfile, delimiter = ' ')
-    #        IMU_writer.writerow("The flat matrix is " + str(flatMatrix) + " \n")
-    
-    with open(IMU_file, 'a') as csvfile:
-            IMU_writer = csv.writer(csvfile, delimiter = ' ')
-            flatMatrixWrite = [flatMatrix[0][0], flatMatrix[0][1], flatMatrix[0][2], flatMatrix[1][0],  flatMatrix[1][1], flatMatrix[1][2]]
-            IMU_writer.writerow(flatMatrixWrite)
-
-    # IMU_output.writerow("The flat matrix is " + str(flatMatrix) + " \n")
-
-    #this determines the number of times the IMU reads data
-    IMU_cycleThreshold = 5
-    IMU_cycleCounter = 1 
-    return IMU_cycleThreshold, IMU_cycleCounter
-
-#read data from IMU
-def imu_getdata(IMU_cycleCounter, IMU_cycleThreshold):
-    if IMU_cycleCounter == IMU_cycleThreshold:
-        currentTimeD = tick - datetime.now()
-        currentReading, errorCounter = produceVector(bno)
-        currentEditedReading = currentReading - flatMatrix
-
-        dataWrite = [currentTimeD.total_seconds(), currentEditedReading[0][0], currentEditedReading[0][1], currentEditedReading[0][2], currentEditedReading[1][0], currentEditedReading[1][1], currentEditedReading[1][2], chassisOutput1, tibiaOutput1, chassisOutput2, tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4] 
-        
-        #IMU_output.writerow(str(currentTimeD.total_seconds()) + " ")
-        #IMU_output.write(str(currentReading[0])+ ' ' + str(currentReading[1]))
-        #IMU_output.writerow(str(currentEditedReading[0]) + ' ' + str(currentEditedReading[1]))
-
-        #the below line also outputs tibia and femur positions
-        #IMU_output.writerow(str(chassisOutput1) + " " + str(tibiaOutput1) + " ")
-        #IMU_output.writerow(str(chassisOutput2) + " " + str(tibiaOutput2) + " ")
-        #IMU_output.writerow(str(chassisOutput3) + " " + str(tibiaOutput3) + " ")
-        #IMU_output.writerow(str(chassisOutput4) + " " + str(tibiaOutput4) + " ")
-
-        with open(IMU_file, 'a') as csvfile:
-                IMU_writer = csv.writer(csvfile, delimiter = ' ')
-                IMU_writer.writerow(dataWrite)
-        #IMU_output.writerow('\n')
 
 def motor_getsignal(motor_type, chassisOutput1, tibiaOutput1, chassisOutput2, tibiaOutput2,
                 chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4):
@@ -203,80 +159,80 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
     motor7_min = motor_minmax_values[0]
     motor7_max = motor_minmax_values[1]
 
-    for i in range(3):
-        for i in range(len(chassis)):
-            if leg1_counter >= len(chassis):
-                leg1_counter -= len(chassis)
-            if leg2_counter >= len(chassis):
-                leg2_counter -= len(chassis)
-            if leg3_counter >= len(chassis):
-                leg3_counter -= len(chassis)
-            if leg4_counter >= len(chassis):
-                leg4_counter -= len(chassis)
+    # for i in range(3):
+    for i in range(len(chassis)):
+        if leg1_counter >= len(chassis):
+            leg1_counter -= len(chassis)
+        if leg2_counter >= len(chassis):
+            leg2_counter -= len(chassis)
+        if leg3_counter >= len(chassis):
+            leg3_counter -= len(chassis)
+        if leg4_counter >= len(chassis):
+            leg4_counter -= len(chassis)
 
-            # #determines whether the IMU will read in the current cycle
-            # if dataIMU==1:
-            #     if IMU_cycleCounter == IMU_cycleThreshold:
-            #             IMU_cycleCounter = 1
-            #     else:
-            #             IMU_cycleCounter+= 1
+        # #determines whether the IMU will read in the current cycle
+        # if dataIMU==1:
+        #     if IMU_cycleCounter == IMU_cycleThreshold:
+        #             IMU_cycleCounter = 1
+        #     else:
+        #             IMU_cycleCounter+= 1
+        
+        #run for percentages
+        if motor_type == 1 or motor_type == 2:
+        
+            chassisOutput1 = chassis[leg1_counter]*(motor0_max-motor0_min) + motor0_min
+            tibiaOutput1 = tibia[leg1_counter]*(motor1_max-motor1_min)+motor1_min
             
-            #run for percentages
-            if motor_type == 1 or motor_type == 2:
+            chassisOutput2 = chassis[leg2_counter]*(motor2_max-motor2_min) + motor2_min
+            tibiaOutput2 = tibia[leg2_counter]*(motor3_max-motor3_min)+motor3_min
+
+            chassisOutput3 = chassis[leg3_counter]*(motor4_max-motor4_min) + motor4_min
+            tibiaOutput3 = tibia[leg3_counter]*(motor5_max-motor5_min)+motor5_min
+
+            chassisOutput4 = chassis[leg4_counter]*(motor6_max-motor6_min) + motor6_min
+            tibiaOutput4 = tibia[leg4_counter]*(motor7_max-motor7_min)+motor7_min   
+
+
+            singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
+                tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            rospy.loginfo(str(singal1))
+            motor_pub.publish(str(singal1))
+            rate.sleep()
+
+            # singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
+            #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            # rospy.loginfo(str(singal2))
+            # motor_pub.publish(str(singal2))
+            # rate.sleep()
+
+        #run for motor angles
+        elif self.motor.motor_type == 3:
+            chassisOutput1 = chassis[leg1_counter]
+            tibiaOutput1 = tibia[leg1_counter]
             
-                chassisOutput1 = chassis[leg1_counter]*(motor0_max-motor0_min) + motor0_min
-                tibiaOutput1 = tibia[leg1_counter]*(motor1_max-motor1_min)+motor1_min
-                
-                chassisOutput2 = chassis[leg2_counter]*(motor2_max-motor2_min) + motor2_min
-                tibiaOutput2 = tibia[leg2_counter]*(motor3_max-motor3_min)+motor3_min
+            chassisOutput2 = chassis[leg2_counter]
+            tibiaOutput2 = tibia[leg2_counter]
 
-                chassisOutput3 = chassis[leg3_counter]*(motor4_max-motor4_min) + motor4_min
-                tibiaOutput3 = tibia[leg3_counter]*(motor5_max-motor5_min)+motor5_min
+            chassisOutput3 = chassis[leg3_counter]
+            tibiaOutput3 = tibia[leg3_counter]
 
-                chassisOutput4 = chassis[leg4_counter]*(motor6_max-motor6_min) + motor6_min
-                tibiaOutput4 = tibia[leg4_counter]*(motor7_max-motor7_min)+motor7_min   
+            chassisOutput4 = chassis[leg4_counter]
+            tibiaOutput4 = tibia[leg4_counter]  
+            
+            
+            # singal3 = motor_getsignal(3, chassisOutput1, tibiaOutput1, chassisOutput2, \
+            #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            # rospy.loginfo(str(singal3))
+            # motor_pub.publish(str(singal3))
+            # rate.sleep()
 
+        # #read data from IMU
+        # imu_getdata(IMU_cycleCounter, IMU_cycleThreshold)
 
-                singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
-                    tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-                rospy.loginfo(str(singal1))
-                motor_pub.publish(str(singal1))
-                rate.sleep()
-
-                # singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
-                #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-                # rospy.loginfo(str(singal2))
-                # motor_pub.publish(str(singal2))
-                # rate.sleep()
-
-            #run for motor angles
-            elif self.motor.motor_type == 3:
-                chassisOutput1 = chassis[leg1_counter]
-                tibiaOutput1 = tibia[leg1_counter]
-                
-                chassisOutput2 = chassis[leg2_counter]
-                tibiaOutput2 = tibia[leg2_counter]
-
-                chassisOutput3 = chassis[leg3_counter]
-                tibiaOutput3 = tibia[leg3_counter]
-
-                chassisOutput4 = chassis[leg4_counter]
-                tibiaOutput4 = tibia[leg4_counter]  
-                
-                
-                # singal3 = motor_getsignal(3, chassisOutput1, tibiaOutput1, chassisOutput2, \
-                #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-                # rospy.loginfo(str(singal3))
-                # motor_pub.publish(str(singal3))
-                # rate.sleep()
-
-            # #read data from IMU
-            # imu_getdata(IMU_cycleCounter, IMU_cycleThreshold)
-
-            leg1_counter+=1
-            leg2_counter+=1
-            leg3_counter+=1
-            leg4_counter+=1
+        leg1_counter+=1
+        leg2_counter+=1
+        leg3_counter+=1
+        leg4_counter+=1
 
 def main():
     # chassis, tibia = gaitModule.randomGait()

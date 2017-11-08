@@ -18,11 +18,11 @@ def callback(data):
     args = ast.literal_eval(data.data)
     motor_type, motor_output_1, motor_output_2, motor_output_3,motor_output_4 = parse_args(args)
     # successfully parsing the arguments1)
-    spyndraMotor.set_motor_type(motor_type)
-    spyndraMotor.output_motor(motor_output_1)
-    spyndraMotor.output_motor(motor_output_2)
-    spyndraMotor.output_motor(motor_output_3)
-    spyndraMotor.output_motor(motor_output_4)
+    #spyndraMotor.set_motor_type(motor_type)
+    # spyndraMotor.output_motor(motor_output_1)
+    # spyndraMotor.output_motor(motor_output_2)
+    # spyndraMotor.output_motor(motor_output_3)
+    # spyndraMotor.output_motor(motor_output_4)
     
 
 def signal_receiver():
