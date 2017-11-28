@@ -35,8 +35,11 @@
 
 
 import rospy
+import message_filters
 from std_msgs.msg import String
+from sensor_msgs.msg import Imu
 from spyndra import gaitModule
+from spyndra.msg import MotorSignal
 
 # from BNO055 import *
 # import Adafruit_PCA9685
@@ -45,6 +48,7 @@ import json
 import numpy as np
 import time
 import csv
+import getch
 from subprocess import Popen, PIPE
 
 
@@ -129,14 +133,6 @@ def set_leg_counter(phase, chassis):
 
 
 def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
-    # publisher init
-    motor_pub = rospy.Publisher('motor/signal', String, queue_size=10)
-    # imu_pub = rospy.Publisher('imu/data', String, queue_size=10)
-    rospy.init_node('spline_runner', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
-
-    # comment out imu stuff for now
-    # IMU_cycleThreshold, IMU_cycleCounter = imu_init()
     
     leg1_counter, leg2_counter, leg3_counter, leg4_counter\
     = set_leg_counter(phase, chassis)
@@ -170,12 +166,6 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
         if leg4_counter >= len(chassis):
             leg4_counter -= len(chassis)
 
-        # #determines whether the IMU will read in the current cycle
-        # if dataIMU==1:
-        #     if IMU_cycleCounter == IMU_cycleThreshold:
-        #             IMU_cycleCounter = 1
-        #     else:
-        #             IMU_cycleCounter+= 1
         
         #run for percentages
         if motor_type == 1 or motor_type == 2:
@@ -195,16 +185,7 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
 
             singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
                 tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-            rospy.loginfo(str(singal1))
-            motor_pub.publish(str(singal1))
-            rate.sleep()
-
-            # singal2 = motor_getsignal(2, chassisOutput1, tibiaOutput1, chassisOutput2, \
-            #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-            # rospy.loginfo(str(singal2))
-            # motor_pub.publish(str(singal2))
-            # rate.sleep()
-
+    
         #run for motor angles
         elif self.motor.motor_type == 3:
             chassisOutput1 = chassis[leg1_counter]
@@ -218,31 +199,42 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
 
             chassisOutput4 = chassis[leg4_counter]
             tibiaOutput4 = tibia[leg4_counter]  
-            
-            
-            # singal3 = motor_getsignal(3, chassisOutput1, tibiaOutput1, chassisOutput2, \
-            #     tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
-            # rospy.loginfo(str(singal3))
-            # motor_pub.publish(str(singal3))
-            # rate.sleep()
-
-        # #read data from IMU
-        # imu_getdata(IMU_cycleCounter, IMU_cycleThreshold)
-
+         
         leg1_counter+=1
         leg2_counter+=1
         leg3_counter+=1
         leg4_counter+=1
+    
+    return chassisOutput1, chassisOutput2, chassisOutput3, chassisOutput4, tibiaOutput1, tibiaOutput2, tibiaOutput3, tibiaOutput4    
 
-def main():
-    # chassis, tibia = gaitModule.randomGait()
-    chassis, tibia = gaitModule.standingGait()
+def callback(msg):
+    #gravity = msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z 
+    #euler   = msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z
+    
+    if msg.data == "cmd_1":
+        chassis, tibia = gaitModule.standingGait()
+    elif msg.data == "cmd_2":
+        chassis, tibia = gaitModule.randomGait()
+        
     phase = 0
     motor_minmax_values = 250, 300
     motor_type = 1
-    while not rospy.is_shutdown():
-        spline_run(chassis, tibia, phase, motor_type, motor_minmax_values)
+    
+    pub = rospy.Publisher("motor_signal", MotorSignal, queue_size=10)
+    motor_signal = MotorSignal()
+    motor_signal.motor_type = motor_type
+    motor_signal.chassis_1, motor_signal.chassis_2, motor_signal.chassis_3, motor_signal.chassis_4, \
+    motor_signal.tibia_1,   motor_signal.tibia_2,   motor_signal.tibia_3,   motor_signal.tibia_4 \
+                             = spline_run(chassis, tibia, phase, motor_type, motor_minmax_values)
+    pub.publish(motor_signal)
+    rospy.loginfo(motor_signal)
 
+def main():
+    rospy.init_node("motor_control_node")
+    #rospy.Subscriber("/imu/data", Imu, callback)
+    rospy.Subscriber("/user_cmd", String, callback)
+    rospy.spin()
+    
 
 if __name__ == '__main__':
     try:
