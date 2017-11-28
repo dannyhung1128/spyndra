@@ -1,6 +1,5 @@
-import Adafruit_PCA9685
-
-# 
+#import Adafruit_PCA9685
+ 
 class SpyndraMotor:
 
 	def __init__(self, freq=60, motor_type=1):
