@@ -21,25 +21,20 @@ def callback(msg):
     spyndraMotor.output_motor(chassis_4, tibia_4, 6, 7)
 
     bag = rosbag.Bag('motors.bag', 'w')
-        
-    seq = 0
-    while not rospy.is_shutdown():
-        # publishing imu data
-        motor_data.header.stamp = rospy.Time.now()
-        motor_data.header.frame_id = "spyndra_node"
-        motor_data.header.seq = seq
-        motor_data.motor0 = msg.chassis_1
-        motor_data.motor1 = msg.tibia_1
-        motor_data.motor2 = msg.chassis_2
-        motor_data.motor3 = msg.tibia_2
-        motor_data.motor4 = msg.chassis_3
-        motor_data.motor5 = msg.tibia_3
-        motor_data.motor6 = msg.chassis_4
-        motor_data.motor7 = msg.tibia_4
-       
-        bag.write('/motor/data', motor_data)
-        seq += 1
-        rate.sleep()
+    
+    # publishing imu data
+    motor_data.header.stamp = rospy.Time.now()
+    motor_data.header.frame_id = "spyndra_node"
+    motor_data.motor0 = msg.chassis_1
+    motor_data.motor1 = msg.tibia_1
+    motor_data.motor2 = msg.chassis_2
+    motor_data.motor3 = msg.tibia_2
+    motor_data.motor4 = msg.chassis_3
+    motor_data.motor5 = msg.tibia_3
+    motor_data.motor6 = msg.chassis_4
+    motor_data.motor7 = msg.tibia_4
+   
+    bag.write('/motor/data', motor_data)
     bag.close()
     
 
