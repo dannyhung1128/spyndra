@@ -76,6 +76,7 @@ rostopic echo /motor_signal
 rostopic echo /imu/data
 ```
 
+6. IMU data will be automatically saved in "~/catkin_ws/src/spyndra/src/" with name "imu_data+time.bag" is ros bag format.
 
 ## License
 
