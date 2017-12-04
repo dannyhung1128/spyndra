@@ -155,6 +155,8 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
     motor7_min = motor_minmax_values[0]
     motor7_max = motor_minmax_values[1]
 
+    chassisOutput1, chassisOutput2, chassisOutput3, chassisOutput4 = [], [], [], []
+    tibiaOutput1, tibiaOutput2, tibiaOutput3, tibiaOutput4 = [], [], [], []
     # for i in range(3):
     for i in range(len(chassis)):
         if leg1_counter >= len(chassis):
@@ -170,35 +172,35 @@ def spline_run(chassis, tibia, phase, motor_type, motor_minmax_values):
         #run for percentages
         if motor_type == 1 or motor_type == 2:
         
-            chassisOutput1 = chassis[leg1_counter]*(motor0_max-motor0_min) + motor0_min
-            tibiaOutput1 = tibia[leg1_counter]*(motor1_max-motor1_min)+motor1_min
+            chassisOutput1 += [chassis[leg1_counter]*(motor0_max-motor0_min) + motor0_min]
+            tibiaOutput1 += [tibia[leg1_counter]*(motor1_max-motor1_min)+motor1_min]
             
-            chassisOutput2 = chassis[leg2_counter]*(motor2_max-motor2_min) + motor2_min
-            tibiaOutput2 = tibia[leg2_counter]*(motor3_max-motor3_min)+motor3_min
+            chassisOutput2 += [chassis[leg2_counter]*(motor2_max-motor2_min) + motor2_min]
+            tibiaOutput2 += [tibia[leg2_counter]*(motor3_max-motor3_min)+motor3_min]
 
-            chassisOutput3 = chassis[leg3_counter]*(motor4_max-motor4_min) + motor4_min
-            tibiaOutput3 = tibia[leg3_counter]*(motor5_max-motor5_min)+motor5_min
+            chassisOutput3 += [chassis[leg3_counter]*(motor4_max-motor4_min) + motor4_min]
+            tibiaOutput3 += [tibia[leg3_counter]*(motor5_max-motor5_min)+motor5_min]
 
-            chassisOutput4 = chassis[leg4_counter]*(motor6_max-motor6_min) + motor6_min
-            tibiaOutput4 = tibia[leg4_counter]*(motor7_max-motor7_min)+motor7_min   
+            chassisOutput4 += [chassis[leg4_counter]*(motor6_max-motor6_min) + motor6_min]
+            tibiaOutput4 += [tibia[leg4_counter]*(motor7_max-motor7_min)+motor7_min]
 
 
-            singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
-                tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
+            #singal1 = motor_getsignal(1, chassisOutput1, tibiaOutput1, chassisOutput2, \
+             #   tibiaOutput2, chassisOutput3, tibiaOutput3, chassisOutput4, tibiaOutput4)
     
         #run for motor angles
         elif self.motor.motor_type == 3:
-            chassisOutput1 = chassis[leg1_counter]
-            tibiaOutput1 = tibia[leg1_counter]
+            chassisOutput1 += [chassis[leg1_counter]]
+            tibiaOutput1 += [tibia[leg1_counter]]
             
-            chassisOutput2 = chassis[leg2_counter]
-            tibiaOutput2 = tibia[leg2_counter]
+            chassisOutput2 += [chassis[leg2_counter]]
+            tibiaOutput2 += [tibia[leg2_counter]]
 
-            chassisOutput3 = chassis[leg3_counter]
-            tibiaOutput3 = tibia[leg3_counter]
+            chassisOutput3 += [chassis[leg3_counter]]
+            tibiaOutput3 += [tibia[leg3_counter]]
 
-            chassisOutput4 = chassis[leg4_counter]
-            tibiaOutput4 = tibia[leg4_counter]  
+            chassisOutput4 += [chassis[leg4_counter]]
+            tibiaOutput4 += [tibia[leg4_counter]]
          
         leg1_counter+=1
         leg2_counter+=1
@@ -215,19 +217,21 @@ def callback(msg):
         chassis, tibia = gaitModule.standingGait()
     elif msg.data == "cmd_2":
         chassis, tibia = gaitModule.randomGait()
-        
+    
     phase = 0
     motor_minmax_values = 250, 300
     motor_type = 1
-    
+    outputs = zip(*spline_run(chassis, tibia, phase, motor_type, motor_minmax_values))
+
     pub = rospy.Publisher("motor_signal", MotorSignal, queue_size=10)
-    motor_signal = MotorSignal()
-    motor_signal.motor_type = motor_type
-    motor_signal.chassis_1, motor_signal.chassis_2, motor_signal.chassis_3, motor_signal.chassis_4, \
-    motor_signal.tibia_1,   motor_signal.tibia_2,   motor_signal.tibia_3,   motor_signal.tibia_4 \
-                             = spline_run(chassis, tibia, phase, motor_type, motor_minmax_values)
-    pub.publish(motor_signal)
-    rospy.loginfo(motor_signal)
+    for i in range(len(outputs)):
+        motor_signal = MotorSignal()
+        motor_signal.motor_type = motor_type
+        motor_signal.chassis_1, motor_signal.chassis_2, motor_signal.chassis_3, motor_signal.chassis_4, \
+        motor_signal.tibia_1,   motor_signal.tibia_2,   motor_signal.tibia_3,   motor_signal.tibia_4 \
+                             = outputs[i]
+        pub.publish(motor_signal)
+        rospy.loginfo(i)
 
 def main():
     rospy.init_node("motor_control_node")
