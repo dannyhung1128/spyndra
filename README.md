@@ -1,8 +1,8 @@
 # Spyndra ROS
-This project provides software architecture and controller in ROS for the open-source robotic platform [Spyndra][http://www.creativemachineslab.com/spyndra.html].
+This project provides software architecture and controller in ROS for the open-source robotic platform <a href="http://www.creativemachineslab.com/spyndra.html">Spyndra</a>.
 
 ## Installation
-This project assumes using [ROS Indigo][http://wiki.ros.org/indigo/Installation/Ubuntu]
+This project assumes using <a href="http://wiki.ros.org/indigo/Installation/Ubuntu">ROS Indigo</a>.
 
 1. Suppose you have not created your ROS workspace, you can create one by the command:
 ```
@@ -80,4 +80,4 @@ rostopic echo /imu/data
 
 ## License
 
-This work is licensed under [MIT License][https://opensource.org/licenses/MIT].
+This work is licensed under <a href="https://opensource.org/licenses/MIT">MIT License</a>.
