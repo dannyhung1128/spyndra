@@ -131,13 +131,14 @@ class Ax12:
     RPI_DIRECTION_RX = GPIO.LOW
     RPI_DIRECTION_SWITCH_DELAY = 0.0001
 
-    # static variables
-    port = None
-    gpioSet = False
+    # # static variables
+    # port = None
+    # gpioSet = False
 
-    def __init__(self):
+    def __init__(self, port =None, gpioSet = False):
         if(Ax12.port == None):
-            Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.001)
+            # Ax12.port = Serial("/dev/ttyAMA0", baudrate=1000000, timeout=0.001)
+            Ax12.port = Serial("/dev/ttyUSB0", baudrate=1000000, timeout=0.001)
         if(not Ax12.gpioSet):
             GPIO.setwarnings(False)
             GPIO.setmode(GPIO.BCM)
