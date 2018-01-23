@@ -9,6 +9,7 @@ import ast
 # spyndraMotor = motorModule.SpyndraMotor()
 
 def callback(msg):
+    # subscribe the msg "/motor_signal"
     motor_type = msg.motor_type
     chassis_1, chassis_2, chassis_3, chassis_4 = msg.chassis_1, msg.chassis_2, msg.chassis_3, msg.chassis_4
     tibia_1,   tibia_2,   tibia_3,   tibia_4   = msg.tibia_1, msg.tibia_2, msg.tibia_3, msg.tibia_4
@@ -17,7 +18,7 @@ def callback(msg):
     # connect to 8 motors in a serial
     motors = ax12.Ax12(msg.port)
 
-    #outoput signal to id and goal position, need translation
+    # outoput signal to id and goal position, need translation
     motors.move(1, chassis_1)
 
     # adafruit motor
